@@ -19,8 +19,8 @@
 */
 
 #include "WiFiClientSecure.h"
-#include <lwip/sockets.h>
-#include <lwip/netdb.h>
+#include <atu_sockets.h>
+#include <atu_netdb.h>
 #include <errno.h>
 
 #undef connect

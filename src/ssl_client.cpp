@@ -6,18 +6,17 @@
 * Additions Copyright (C) 2017 Evandro Luis Copercini, Apache 2.0 License.
 */
 
-#include "Arduino.h"
-#include <esp32-hal-log.h>
-#include <lwip/err.h>
-#include <lwip/sockets.h>
-#include <lwip/sys.h>
-#include <lwip/netdb.h>
+#include "Seeed_atUnified.h"
 #include <mbedtls/sha256.h>
 #include <mbedtls/oid.h>
+#undef max
+#undef min
 #include <algorithm>
 #include <string>
 #include "ssl_client.h"
-#include "WiFi.h"
+#include "AtWiFi.h"
+#include "Seeed_mbedtls.h"
+
 
 #ifndef MBEDTLS_KEY_EXCHANGE__SOME__PSK_ENABLED
 #  error "Please configure IDF framework to include mbedTLS -> Enable pre-shared-key ciphersuites and activate at least one cipher"
@@ -48,6 +47,10 @@ void ssl_init(sslclient_context *ssl_client)
     mbedtls_ssl_init(&ssl_client->ssl_ctx);
     mbedtls_ssl_config_init(&ssl_client->ssl_conf);
     mbedtls_ctr_drbg_init(&ssl_client->drbg_ctx);
+    // less debug info
+    // mbedtls_esp_enable_debug_log(&ssl_client->ssl_conf, 1);
+    // more debug info
+    // mbedtls_esp_enable_debug_log(&ssl_client->ssl_conf, 4);
 }
 
 
@@ -56,12 +59,12 @@ int start_ssl_client(sslclient_context *ssl_client, const char *host, uint32_t p
     char buf[512];
     int ret, flags;
     int enable = 1;
-    log_v("Free internal heap before TLS %u", ESP.getFreeHeap());
+    log_v("Free internal heap before TLS %u", get_free_heap());
 
     log_v("Starting socket");
     ssl_client->socket = -1;
 
-    ssl_client->socket = lwip_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ssl_client->socket = atu_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (ssl_client->socket < 0) {
         log_e("ERROR opening socket");
         return ssl_client->socket;
@@ -78,14 +81,14 @@ int start_ssl_client(sslclient_context *ssl_client, const char *host, uint32_t p
     serv_addr.sin_addr.s_addr = srv;
     serv_addr.sin_port = htons(port);
 
-    if (lwip_connect(ssl_client->socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0) {
+    if (atu_connect_r(ssl_client->socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == 0) {
         if(timeout <= 0){
             timeout = 30000;
         }
-        lwip_setsockopt(ssl_client->socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-        lwip_setsockopt(ssl_client->socket, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
-        lwip_setsockopt(ssl_client->socket, IPPROTO_TCP, TCP_NODELAY, &enable, sizeof(enable));
-        lwip_setsockopt(ssl_client->socket, SOL_SOCKET, SO_KEEPALIVE, &enable, sizeof(enable));
+        atu_setsockopt_r(ssl_client->socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+        atu_setsockopt_r(ssl_client->socket, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+        atu_setsockopt_r(ssl_client->socket, IPPROTO_TCP, TCP_NODELAY, &enable, sizeof(enable));
+        atu_setsockopt_r(ssl_client->socket, SOL_SOCKET, SO_KEEPALIVE, &enable, sizeof(enable));
     } else {
         log_e("Connect to Server failed!");
         return -1;
@@ -240,7 +243,7 @@ int start_ssl_client(sslclient_context *ssl_client, const char *host, uint32_t p
         mbedtls_pk_free(&ssl_client->client_key);
     }    
 
-    log_v("Free internal heap after TLS %u", ESP.getFreeHeap());
+    log_v("Free internal heap after TLS %u", get_free_heap());
 
     return ssl_client->socket;
 }

@@ -4,6 +4,7 @@
 
 #ifndef ARD_SSL_H
 #define ARD_SSL_H
+#include "Seeed_mbedtls.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/net.h"
 #include "mbedtls/debug.h"
