@@ -11,6 +11,11 @@
 const char* ssid     = "your-ssid";     // your network SSID (name of wifi network)
 const char* password = "your-password"; // your network password
 
+#define THE_HOST_HOWSMY   0
+#define THE_HOST_JIANSHU  1
+/* China users should use THE_HOST_JIANSHU to do following testing */
+#define THE_HOST		THE_HOST_HOWSMY
+#if THE_HOST == THE_HOST_HOWSMY
 const char*  server = "www.howsmyssl.com";  // Server URL
 
 // www.howsmyssl.com root certificate authority, to verify the server
@@ -45,6 +50,42 @@ const char* test_root_ca= \
      "PfZ+G6Z6h7mjem0Y+iWlkYcV4PIWL1iwBi8saCbGS5jN2p8M+X+Q7UNKEkROb3N6\n" \
      "KOqkqm57TH2H3eDJAkSnh6/DNFu0Qg==\n" \
      "-----END CERTIFICATE-----\n";
+
+#elif THE_HOST == THE_HOST_JIANSHU
+const char*  server = "www.jianshu.com";  // Server URL
+
+const char* test_root_ca= \
+"-----BEGIN CERTIFICATE-----\n"
+"MIIElDCCA3ygAwIBAgIQAf2j627KdciIQ4tyS8+8kTANBgkqhkiG9w0BAQsFADBh\n"
+"MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n"
+"d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\n"
+"QTAeFw0xMzAzMDgxMjAwMDBaFw0yMzAzMDgxMjAwMDBaME0xCzAJBgNVBAYTAlVT\n"
+"MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxJzAlBgNVBAMTHkRpZ2lDZXJ0IFNIQTIg\n"
+"U2VjdXJlIFNlcnZlciBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\n"
+"ANyuWJBNwcQwFZA1W248ghX1LFy949v/cUP6ZCWA1O4Yok3wZtAKc24RmDYXZK83\n"
+"nf36QYSvx6+M/hpzTc8zl5CilodTgyu5pnVILR1WN3vaMTIa16yrBvSqXUu3R0bd\n"
+"KpPDkC55gIDvEwRqFDu1m5K+wgdlTvza/P96rtxcflUxDOg5B6TXvi/TC2rSsd9f\n"
+"/ld0Uzs1gN2ujkSYs58O09rg1/RrKatEp0tYhG2SS4HD2nOLEpdIkARFdRrdNzGX\n"
+"kujNVA075ME/OV4uuPNcfhCOhkEAjUVmR7ChZc6gqikJTvOX6+guqw9ypzAO+sf0\n"
+"/RR3w6RbKFfCs/mC/bdFWJsCAwEAAaOCAVowggFWMBIGA1UdEwEB/wQIMAYBAf8C\n"
+"AQAwDgYDVR0PAQH/BAQDAgGGMDQGCCsGAQUFBwEBBCgwJjAkBggrBgEFBQcwAYYY\n"
+"aHR0cDovL29jc3AuZGlnaWNlcnQuY29tMHsGA1UdHwR0MHIwN6A1oDOGMWh0dHA6\n"
+"Ly9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RDQS5jcmwwN6A1\n"
+"oDOGMWh0dHA6Ly9jcmw0LmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbFJvb3RD\n"
+"QS5jcmwwPQYDVR0gBDYwNDAyBgRVHSAAMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8v\n"
+"d3d3LmRpZ2ljZXJ0LmNvbS9DUFMwHQYDVR0OBBYEFA+AYRyCMWHVLyjnjUY4tCzh\n"
+"xtniMB8GA1UdIwQYMBaAFAPeUDVW0Uy7ZvCj4hsbw5eyPdFVMA0GCSqGSIb3DQEB\n"
+"CwUAA4IBAQAjPt9L0jFCpbZ+QlwaRMxp0Wi0XUvgBCFsS+JtzLHgl4+mUwnNqipl\n"
+"5TlPHoOlblyYoiQm5vuh7ZPHLgLGTUq/sELfeNqzqPlt/yGFUzZgTHbO7Djc1lGA\n"
+"8MXW5dRNJ2Srm8c+cftIl7gzbckTB+6WohsYFfZcTEDts8Ls/3HB40f/1LkAtDdC\n"
+"2iDJ6m6K7hQGrn2iWZiIqBtvLfTyyRRfJs8sjX7tN8Cp1Tm5gr8ZDOo0rwAhaPit\n"
+"c+LJMto4JQtV05od8GiG7S5BNO98pVAdvzr508EIDObtHopYJeS4d60tbvVS3bR0\n"
+"j6tJLp07kzQoH3jOlOrHvdPJbRzeXDLz\n"
+"-----END CERTIFICATE-----\n"
+;
+#else
+#error select proper THE_HOST macro.
+#endif
 
 // You can use x.509 client certificates if you want
 //const char* test_client_key = "";   //to verify the client
@@ -82,8 +123,13 @@ void setup() {
   else {
     Serial.println("Connected to server!");
     // Make a HTTP request:
+    #if THE_HOST == THE_HOST_HOWSMY
     client.println("GET https://www.howsmyssl.com/a/check HTTP/1.0");
     client.println("Host: www.howsmyssl.com");
+    #elif THE_HOST == THE_HOST_JIANSHU
+    client.println("GET https://www.jianshu.com/sign_in HTTP/1.0");
+    client.println("Host: www.jianshu.com");
+    #endif
     client.println("Connection: close");
     client.println();
 
@@ -98,6 +144,8 @@ void setup() {
     // from the server, read them and print them:
     while (client.available()) {
       char c = client.read();
+      if (c == '\n')
+        Serial.write('\r');
       Serial.write(c);
     }
 
