@@ -1,4 +1,4 @@
-WiFiClientSecure
+WiFiClientSecure  [![Build Status](https://travis-ci.com/Seeed-Studio/Seeed_Arduino_atWiFiClientSecure.svg?branch=master)](https://travis-ci.com/Seeed-Studio/Seeed_Arduino_atWiFiClientSecure)
 ================
 
 The WiFiClientSecure class implements support for secure connections using TLS (SSL).
