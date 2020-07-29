@@ -79,7 +79,7 @@ WiFiClientSecure& WiFiClientSecure::operator=(const WiFiClientSecure& other) {
 
 void WiFiClientSecure::stop() {
     if (sslclient->socket >= 0) {
-        close(sslclient->socket);
+        closesocket(sslclient->socket);
         sslclient->socket = -1;
         _connected = false;
         _peek = -1;
