@@ -263,7 +263,7 @@ void stop_ssl_socket(sslclient_context* ssl_client, const char* rootCABuff, cons
     log_v("Cleaning SSL connection.");
 
     if (ssl_client->socket >= 0) {
-        close(ssl_client->socket);
+        closesocket(ssl_client->socket);
         ssl_client->socket = -1;
     }
 
